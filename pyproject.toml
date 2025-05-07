@@ -1,0 +1,168 @@
+# pyproject.toml
+
+# --- Build System Configuration ---
+# Specifies how the package should be built.
+# Using setuptools is standard and well-supported.
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# --- Project Metadata ---
+# Core information about the package.
+[project]
+name = "paleo-workflow-kit" # Distribution name on PyPI (use hyphens)
+# version = "0.1.0" # Option 1: Hardcode version (simple)
+# Option 2: Dynamic version (Recommended for larger projects)
+# Requires configuration in [tool.setuptools.dynamic] or a setup.py shim.
+# For now, we'll comment it out and assume dynamic or manual setting.
+dynamic = ["version"] # Tells build system version is defined elsewhere (e.g., __init__.py via setuptools_scm or similar)
+description = "A Python package for paleographic document processing workflows using Transkribus and LLMs."
+readme = "README.md" # Path to your README file
+requires-python = ">=3.8" # Minimum Python version required
+license = { file = "LICENSE" } # Placeholder: Create a LICENSE file (e.g., MIT.txt, APACHE.txt) and put its name here
+keywords = ["paleography", "transcription", "manuscript", "Transkribus", "LLM", "OCR", "HTR", "Gemini", "Claude", "document analysis"]
+authors = [
+  { name = "Your Name / Organization", email = "your.email@example.com" },
+  # Add other authors if applicable
+]
+maintainers = [
+  { name = "Your Name / Organization", email = "your.email@example.com" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha", # Or 4 - Beta, 5 - Production/Stable
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License", # Choose your actual license
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Text Processing :: Linguistic",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+# --- Core Dependencies ---
+# Packages required for the basic functionality of the library.
+dependencies = [
+    "requests>=2.25.0,<3.0.0",
+    "python-dotenv>=0.15.0,<2.0.0",
+    "lxml>=4.6.0,<6.0.0", # More robust XML parsing
+    "Pillow>=8.0.0,<11.0.0", # Image processing
+    "python-Levenshtein>=0.12.0,<0.21.0", # For CER calculation (requires C build tools)
+    # OR use an alternative if build tools are an issue:
+    # "Levenshtein>=0.12.0,<0.13.0", # Pure Python version
+    # "rapidfuzz>=3.0.0,<4.0.0",    # Another fast alternative
+]
+
+# --- Optional Dependencies ---
+# Define feature sets that users can install optionally.
+[project.optional-dependencies]
+# LLM Clients
+llm = [
+    "google-generativeai>=0.4.0,<0.6.0", # For Gemini
+    "anthropic>=0.20.0,<0.22.0",        # For Claude
+]
+gemini = ["google-generativeai>=0.4.0,<0.6.0"]
+anthropic = ["anthropic>=0.20.0,<0.22.0"]
+
+# HTML Parsing (for AALT index etc.)
+html = ["beautifulsoup4>=4.9.0,<4.13.0"]
+
+# Excel Output (for reports)
+excel = [
+    "pandas>=1.2.0,<3.0.0",
+    "openpyxl>=3.0.0,<4.0.0", # Required by pandas for xlsx
+]
+
+# Development and Testing Tools
+dev = [
+    "pytest>=6.0.0,<9.0.0",
+    "pytest-cov>=2.10.0,<6.0.0",
+    "mypy>=0.900,<2.0.0",
+    "flake8>=3.8.0,<8.0.0",
+    "black>=22.0.0,<25.0.0",
+    # Add other dev tools like isort, pre-commit hooks etc. if desired
+    # Include optional dependencies needed for full testing
+    "paleo-workflow-kit[llm,html,excel]", # Install all optional features for dev
+]
+
+# --- Project URLs ---
+# Optional links displayed on PyPI.
+[project.urls]
+Homepage = "https://github.com/your_username/paleo-workflow-kit" # Replace with actual URL
+Repository = "https://github.com/your_username/paleo-workflow-kit"
+# Documentation = "https://paleo-workflow-kit.readthedocs.io/" # If you set up Read the Docs
+
+# --- Tool Configuration ---
+
+# --- Setuptools Configuration ---
+[tool.setuptools]
+# Automatically find the package directory (paleo_workflow_kit)
+packages = ["paleo_workflow_kit"]
+# If you have sub-packages like llm_clients, workflows, utils,
+# setuptools should find them automatically if they contain __init__.py.
+# Explicitly listing can also be done:
+# packages = ["paleo_workflow_kit", "paleo_workflow_kit.llm_clients", ...]
+
+# Include non-code files if necessary (e.g., default prompt templates)
+# Example: include all *.txt files within the package
+# package-data = {"paleo_workflow_kit" = ["*.txt", "prompts/*.txt"]}
+
+# --- Dynamic Versioning (Example using setuptools_scm) ---
+# If you want the version to be derived from Git tags, use setuptools_scm.
+# 1. Add setuptools_scm to [build-system] requires:
+#    requires = ["setuptools>=61.0", "wheel", "setuptools_scm[toml]>=6.2"]
+# 2. Add setuptools_scm itself as a dependency (optional but good practice):
+#    Add "setuptools-scm>=6.2" to [project]dependencies
+# 3. Configure it:
+#[tool.setuptools_scm]
+#write_to = "paleo_workflow_kit/_version.py" # Writes the version to a file
+# --- End Dynamic Versioning Example ---
+
+# --- Black Code Formatter Configuration ---
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312'] # Specify target Python versions
+
+# --- Flake8 Linter Configuration ---
+[tool.flake8]
+max-line-length = 88
+extend-ignore = [
+    "E203", # Whitespace before ':' (often conflicts with Black)
+    "W503", # Line break before binary operator (often conflicts with Black)
+]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "venv",
+    ".venv",
+    ".env",
+    "docs",
+    "*.egg-info",
+]
+
+# --- Mypy Type Checker Configuration ---
+[tool.mypy]
+python_version = "3.8" # Your minimum supported version
+ignore_missing_imports = true # Be lenient initially, tighten later if desired
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+# Add specific settings per module if needed
+# [[tool.mypy.overrides]]
+# module = "third_party_lib_without_types.*"
+# ignore_missing_imports = true
+
+# --- Pytest Configuration ---
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --cov=paleo_workflow_kit --cov-report=term-missing" # Show summary, quiet, add coverage
+testpaths = [
+    "tests", # Directory where your tests reside
+]
